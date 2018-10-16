@@ -1,2 +1,2 @@
 # piOpenCV
-IMG template for raspberry Pi with precompiled OpenCV v4.0
+IMG template for raspberry Pi with precompiled OpenCV v3.1.0
