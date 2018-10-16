@@ -5,19 +5,21 @@ OS Image scripts for RaspberryPi
 Add to .bashrc:
 ```
 mntIMG() {
-    sectorSize=`sudo fdisk -l $1 | grep "Sector size" | awk -F' ' '{print $4}'`
-    fat32Offset=`sudo fdisk -l $1 | grep FAT32 | awk -F' ' '{print $2}'`
-    linuxOffset=`sudo fdisk -l $1 | grep Linux | awk -F' ' '{print $2}'`
+    sectorSize=`fdisk -l $1 | grep "Sector size" | awk -F' ' '{print $4}'`
+    fat32Offset=`fdisk -l $1 | grep FAT32 | awk -F' ' '{print $2}'`
+    fat32Size=`fdisk -l $1 | grep FAT32 | awk -F' ' '{print $4}'`
+    linuxOffset=`fdisk -l $1 | grep Linux | awk -F' ' '{print $2}'`
+    linuxSize=`fdisk -l $1 | grep Linux | awk -F' ' '{print $4}'`
 
     umount /mnt/FAT32 || /bin/true
     umount /mnt/LINUX || /bin/true
     mkdir -p /mnt/FAT32
     mkdir -p /mnt/LINUX
-    mount -o offset=$($fat32Offset*$sectorSize) $1 /mnt/FAT32
-    mount -o offset=$($linuxOffset*$sectorSize) $1 /mnt/LINUX
+    mount -o loop,offset=$(($fat32Offset*$sectorSize)),sizelimit=$(($fat32Size*$sectorSize)) $1 /mnt/FAT32
+    mount -o loop,offset=$(($linuxOffset*$sectorSize)),sizelimit=$(($linuxSize*$sectorSize)) $1 /mnt/LINUX
 }
 
-umntLINUX() {
+umntIMG() {
     umount /mnt/FAT32 || /bin/true
     umount /mnt/LINUX || /bin/true
     rmdir /mnt/FAT32
